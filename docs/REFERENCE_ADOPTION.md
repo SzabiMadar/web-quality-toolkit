@@ -36,3 +36,13 @@ This inventory is a snapshot. Do not automatically treat any upstream project's 
 ## Portable skillset v1 (2026-10-26)
 
 The primary deliverable is now the Devin skill plugin under plugins/web-audit, consisting of **independently written instructions**, not imported upstream source or runnable upstream SEO tools. The original three projects above remain **methodological** references. Lighthouse (GoogleChrome/lighthouse), Playwright (microsoft/playwright), axe-core (dequelabs/axe-core) and Linkinator (JustinBeckwith/linkinator) are **optional integrations**, not installed plugin dependencies. No license-covered third-party code or full SKILL.md was copied as part of this release. Refer to docs/SKILLSET_RELEASE.md for scope and limitations.
+
+## Upstream adoption review — portable skillset v1.1.0
+
+Reviewed upstream claude-seo (v2.5.0 main repository) skill and script families: seo-sxo, seo-ecommerce, seo-drift, seo-content-brief, seo-agentic; Python scripts parse_html.py, metadata_template.py, content_verify.py, drift_compare.py, agent_ux_check.py, schema_ecommerce_validate.py, url_safety.py, consistency_check.py and related references.
+
+**Decisions:** independently authored five new specialist skills and three small Node file-input heuristics, with provenance/caution in plugins/web-audit/references/UPSTREAM_LEARNINGS.md. **No original Python code or full third-party skill text was copied**; no Python runtime/third-party npm dependencies introduced.
+
+Upstream per-file licensing and third-party prompt libraries need independent inspection before any future direct port. Guidance claiming mandatory word counts, exactly one H1, AI/GEO scores, llms.txt or WebMCP should remain qualified, not turned into automatic compliance checks.
+
+See docs/TOOLS.md and docs/SKILLSET_RELEASE_1_1.md.

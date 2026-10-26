@@ -11,3 +11,7 @@ Használat:
 Codexben nem állítjuk, hogy a Devin plugin automatikusan települt, vagy a fájljai automatikusan megjelentek agent skillként. Egyedi környezetben a megfelelő skillfájlok másolása/linkelése és a platform telepítési módjának ellenőrzése szükséges. Ne másolj projektkódot vagy ügyfél titkokat a publikus skillsetbe.
 
 A TypeScript CLI külön eszköz, opcionálisan futtatható a saját Node-os projekten.
+
+## v1.1 modulok
+
+A közös módszertan öt új SKILL.md-t is tartalmaz: sxo, ecommerce-seo, seo-drift, content-brief, agent-readiness. A teljes audit koordinátor ezek között feltételesen választ. Nem kell a GitHub-ról automatikusan futtatható harmadik fél scriptjeit telepíteni. A külön Node-ellenőrzők kizárólag saját engedélyezett fájlokkal futtathatók; használati szerződésük: docs/TOOLS.md.

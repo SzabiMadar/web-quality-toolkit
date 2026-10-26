@@ -8,6 +8,7 @@ const expected = [
   'full-audit', 'quick-audit', 'technical-seo', 'on-page-seo',
   'international-seo', 'structured-data', 'internal-links', 'image-audit',
   'performance', 'accessibility', 'content-seo', 'aeo-geo', 'local-seo', 'audit-report',
+  'sxo', 'ecommerce-seo', 'seo-drift', 'content-brief', 'agent-readiness',
 ];
 
 function read(path) { return readFileSync(path, 'utf8'); }
@@ -19,11 +20,12 @@ const manifest = JSON.parse(read(manifestPath));
 assert.equal(manifest.name, 'web-audit');
 assert.match(manifest.version, /^\d+\.\d+\.\d+$/);
 
-for (const filename of ['AUDIT_PROTOCOL.md', 'REPORT_TEMPLATE.md', 'TOOL_MATRIX.md']) {
+for (const filename of ['AUDIT_PROTOCOL.md', 'REPORT_TEMPLATE.md', 'TOOL_MATRIX.md', 'UPSTREAM_LEARNINGS.md']) {
   requireFile(join(plugin, 'references', filename));
 }
 requireFile(join(plugin, 'AGENTS.md'));
 requireFile(join(plugin, 'README.md'));
+for (const name of ['check-metadata.mjs', 'check-claims.mjs', 'compare-snapshots.mjs']) requireFile(join(repo, 'scripts', name));
 requireFile(join(repo, 'integrations', 'chatgpt', 'PROJECT_INSTRUCTIONS.md'));
 requireFile(join(repo, 'integrations', 'codex', 'README.md'));
 

@@ -1,7 +1,7 @@
 {
   "name": "web-audit",
-  "version": "1.0.0",
-  "description": "Reusable SEO, AEO/GEO, accessibility, performance and website quality audit skillset for Devin",
+  "version": "1.1.0",
+  "description": "19 modular evidence-first website audit skills including SXO, e-commerce, drift, content briefs and agent readiness",
   "homepage": "https://github.com/SzabiMadar/web-quality-toolkit",
   "repository": "https://github.com/SzabiMadar/web-quality-toolkit",
   "keywords": [
