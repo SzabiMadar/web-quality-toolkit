@@ -1,7 +1,7 @@
 export type Severity = 'high' | 'medium' | 'low';
 export type Finding = {
   id: string;
-  category: 'canonical' | 'sitemap' | 'robots';
+  category: 'canonical' | 'sitemap' | 'robots' | 'metadata';
   severity: Severity;
   status: 'confirmed';
   file: string;
