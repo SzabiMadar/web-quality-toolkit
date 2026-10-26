@@ -1,0 +1,41 @@
+name: Toolkit CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node.js 22 tests and audit smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run complete test suite
+        run: npm test
+      - name: Smoke test CLI and JSON v2 schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixture="$(mktemp -d)"
+          cp fixtures/valid/index.html "$fixture/index.html"
+          printf '%s\n' '<urlset><url><loc>https://example.com/</loc></url></urlset>' > "$fixture/sitemap.xml"
+          npm run audit -- --dir "$fixture" --site "https://example.com/" --out "$RUNNER_TEMP/wqt-smoke"
+          node --input-type=commonjs -e '
+            const r = require(process.argv[1]);
+            if (r.schemaVersion !== 2 || r.scannedPages !== 1 ||
+                r.coverage.notTested !== 9 || r.passedPages !== 1 ||
+                !r.findings.some(f => f.id === "ROBOTS_MISSING" && f.status === "recommendation")) {
+              throw new Error("Unexpected schema v2 audit results");
+            }
+          ' "$RUNNER_TEMP/wqt-smoke/findings.json"
