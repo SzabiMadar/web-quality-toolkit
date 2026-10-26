@@ -17,6 +17,6 @@ This catalog is intentionally honest about current executable coverage. `Impleme
 | Accessibility | WCAG-oriented objective and human checks | Planned | W3C WCAG |
 | AEO/GEO | Discoverability, answer extractability, source quality, citations vs actual presence | Manual skill guidance (not executed by CLI) | Corey Haines `ai-seo`; AgriciDaniel `seo-geo` |
 
-As of CLI v0.3.0, `findings.json` schemaVersion 2 includes per-target `checks[]` and coverage totals. `passedPages` is a legacy **canonical-only** count. Rules not implemented by the local CLI appear as `not-tested` checks. Source-commit manifest, profiles and full semantic validators remain future work.
+As of CLI v0.4.0, `findings.json` retains schemaVersion 2 and adds a `manifest`: `surface`, `profile`, `configPath`, `nodeVersion`, optional `sourceCommit`, `selectedRules`, `executedRules`, and `skippedRules`. All twelve rule families appear in the `checks[]` coverage list: rules excluded by a profile are `not-tested` with `excluded-by-profile`, while selected-but-unimplemented rules are `not-tested` with `not-implemented`. The `content` profile currently executes **zero** deterministic checks. `passedPages` is a legacy **canonical-only** count; it is zero when canonical is excluded. Full semantic validators remain future work.
 
 Rules should eventually include: stable id, severity, test method, preconditions, proof, official reference URL, source repository reference, and an explicit tested/not-tested status.
