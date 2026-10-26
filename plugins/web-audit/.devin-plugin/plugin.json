@@ -1,0 +1,5 @@
+{
+  "name": "web-audit",
+  "version": "0.2.0",
+  "description": "Read-only, evidence-driven web quality audit skills for Astro and static websites"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "web-quality-toolkit",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22.6"},
+  "scripts": {
+    "audit": "node --experimental-strip-types src/cli.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.ts"
+  }
+}
