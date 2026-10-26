@@ -19,13 +19,13 @@ Changes proposed on `feat/a1-audit-results` for pull request review.
 - `schemaVersion: 2` is a compatibility **break** for strict v1-only consumers. Legacy top-level fields remain, but downstream consumers must understand new finding status values.
 - The complete manifest (source commit and fuller test inventory), project configuration and quick/full/content profiles are not in A1 and remain unchecked in ROADMAP.md.
 - This branch does not modify the Devin plugin. On merge, verify plugin v0.3.0 can parse the v2 JSON and still invoke the CLI successfully.
-- Tests run in a separate local mirrored test environment during development; the GitHub-hosted repository tests should also be executed before merge.
+- **GitHub Actions CI passed** on 2026-10-26: Node.js 22 complete `npm test` and CLI/JSON-schema-v2 smoke test. [Verified workflow run](https://github.com/SzabiMadar/web-quality-toolkit/actions/runs/40370810223).
 
 ## Suggested PR review checklist
 
-- [ ] Run `npm test` on the branch checkout.
-- [ ] Run a real Astro build audit and compare report v1 vs v2.
+- [x] Run `npm test` on the branch checkout (GitHub Actions CI).
+- [ ] Run a real Astro build audit and compare report v1 vs v2 (post-merge integration check).
 - [ ] Confirm no customer files were changed.
 - [ ] Verify new `not-tested` entries do not appear as successful checks.
 - [ ] Confirm advice-only missing robots yields process exit 0.
-- [ ] Validate the imported Devin plugin against the branch CLI.
+- [ ] Validate the imported Devin plugin against the v2 CLI in Devin Desktop (post-merge integration check; cannot be run via GitHub CI).
