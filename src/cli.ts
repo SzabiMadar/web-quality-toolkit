@@ -3,7 +3,7 @@ import { resolve, join } from 'node:path';
 import { checkCanonical, htmlFiles } from './canonical.ts';
 import { checkSitemap } from './sitemap.ts';
 import { checkRobots } from './robots.ts';
-import type { AuditResult } from './types.ts';
+import { auditExitCode, buildAuditResult, toMarkdown } from './report.ts';
 
 function arg(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -21,29 +21,19 @@ async function main(): Promise<void> {
   const out = resolve(arg('--out') ?? './audits/latest');
   const files = await htmlFiles(directory);
   if (!files.length) throw new Error(`No HTML files found in ${directory}`);
-  const all = await Promise.all(files.map(file => checkCanonical(file, directory, parsed.href)));
-  const extra = await Promise.all([checkSitemap(directory, parsed.href, files), checkRobots(directory, parsed.href)]);
-  const findings = [...all.flat(), ...extra.flat()];
-  const result: AuditResult = {
-    schemaVersion: 1,
-    generatedAt: new Date().toISOString(),
-    input: { directory, siteUrl: parsed.href },
-    scannedPages: files.length,
-    passedPages: all.filter(v => !v.length).length,
-    findings,
-  };
+  const canonical = await Promise.all(files.map(file => checkCanonical(file, directory, parsed.href)));
+  const [sitemap, robots] = await Promise.all([
+    checkSitemap(directory, parsed.href, files),
+    checkRobots(directory, parsed.href),
+  ]);
+  const result = buildAuditResult({
+    directory, siteUrl: parsed.href, files, canonical, sitemap, robots,
+  });
   await mkdir(out, { recursive: true });
   await writeFile(join(out, 'findings.json'), JSON.stringify(result, null, 2) + '\n');
-  const lines = [
-    '# Web Quality Toolkit — technical SEO audit', '',
-    `- Scanned pages: **${result.scannedPages}**`,
-    `- Canonical passed: **${result.passedPages}**`,
-    `- Findings: **${findings.length}**`, '',
-    ...findings.flatMap(f => [`## ${f.id} — ${f.file}`, '', f.message, '', '```json', JSON.stringify(f.evidence ?? {}, null, 2), '```', '']),
-  ];
-  await writeFile(join(out, 'summary.md'), lines.join('\n'));
-  console.log(`Audited ${files.length} HTML file(s): ${findings.length} finding(s). Report: ${out}`);
-  if (findings.length) process.exitCode = 1;
+  await writeFile(join(out, 'summary.md'), toMarkdown(result));
+  console.log(`Audited ${files.length} HTML file(s): ${result.findings.length} finding(s), ${result.coverage.notTested} untested check families. Report: ${out}`);
+  process.exitCode = auditExitCode(result);
 }
 
 main().catch(error => { console.error(error instanceof Error ? error.message : error); process.exitCode = 2; });
