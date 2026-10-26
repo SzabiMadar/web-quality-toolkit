@@ -1,19 +1,10 @@
 import { relative, sep } from 'node:path';
-import type { AuditCategory, AuditResult, CheckExecution, CheckStatus, Finding } from './types.ts';
+import { RULES } from './rules.ts';
+import type {
+  AuditProfile, AuditResult, CheckExecution, CheckStatus, Finding, RuleId, SkippedRule,
+} from './types.ts';
 
-export const TOOL_VERSION = '0.3.0';
-
-const NOT_IMPLEMENTED: ReadonlyArray<{ ruleId: string; category: AuditCategory; note: string }> = [
-  { ruleId: 'HREFLANG', category: 'hreflang', note: 'Hreflang syntax, reciprocal links and locale alignment are not implemented.' },
-  { ruleId: 'METADATA', category: 'metadata', note: 'Title, description, headings and meta robots are not implemented.' },
-  { ruleId: 'LINKS', category: 'links', note: 'Internal link targets and orphan pages are not implemented.' },
-  { ruleId: 'SCHEMA', category: 'schema', note: 'JSON-LD and structured-data checks are not implemented.' },
-  { ruleId: 'IMAGES', category: 'images', note: 'Image accessibility and loading checks are not implemented.' },
-  { ruleId: 'HTTP', category: 'http', note: 'No live HTTP request or response is checked.' },
-  { ruleId: 'PERFORMANCE', category: 'performance', note: 'No Lighthouse or field metrics are measured.' },
-  { ruleId: 'ACCESSIBILITY', category: 'accessibility', note: 'No automated or manual WCAG evaluation is performed.' },
-  { ruleId: 'AEO_GEO', category: 'aeo-geo', note: 'No AEO/GEO assessment or AI citation measurement is performed.' },
-];
+export const TOOL_VERSION = '0.4.0';
 
 function statusFor(findings: Finding[]): CheckStatus {
   if (findings.some(f => f.status === 'confirmed')) return 'confirmed';
@@ -22,11 +13,13 @@ function statusFor(findings: Finding[]): CheckStatus {
   return 'passed';
 }
 
-function check(
-  ruleId: string, category: AuditCategory, target: string, method: string,
-  findings: Finding[], note?: string,
-): CheckExecution {
-  return { ruleId, category, target, status: statusFor(findings), method, findingIds: findings.map(f => f.id), ...(note ? { note } : {}) };
+function check(ruleId: RuleId, target: string, method: string, findings: Finding[], note?: string): CheckExecution {
+  const category = RULES.find(r => r.id === ruleId)!.category;
+  return {
+    ruleId, category, target, status: statusFor(findings), method,
+    findingIds: findings.map(f => f.id),
+    ...(note ? { note } : {}),
+  };
 }
 
 export function buildAuditResult(input: {
@@ -37,23 +30,55 @@ export function buildAuditResult(input: {
   sitemap: Finding[];
   robots: Finding[];
   generatedAt?: string;
+  profile?: AuditProfile;
+  selectedRules?: readonly RuleId[];
+  configPath?: string | null;
+  sourceCommit?: string | null;
 }): AuditResult {
-  if (input.files.length !== input.canonical.length) throw new Error('Canonical result count does not match scanned pages');
+  // The old call signature means a full audit; this preserves A1 integration.
+  const profile = input.profile ?? 'full';
+  const selected = new Set<RuleId>(input.selectedRules ?? RULES.map(r => r.id));
+  for (const selectedId of selected) {
+    if (!RULES.some(rule => rule.id === selectedId)) throw new Error(`Unknown selected rule: ${selectedId}`);
+  }
+  if (selected.has('CANONICAL') && input.canonical.length !== input.files.length) {
+    throw new Error('Canonical result count does not match scanned pages');
+  }
+  if (!selected.has('CANONICAL') && input.canonical.length) {
+    throw new Error('Canonical results were supplied even though the rule was not selected');
+  }
+  if (!selected.has('SITEMAP') && input.sitemap.length) {
+    throw new Error('Sitemap results were supplied even though the rule was not selected');
+  }
+  if (!selected.has('ROBOTS') && input.robots.length) {
+    throw new Error('Robots results were supplied even though the rule was not selected');
+  }
   const findings = [...input.canonical.flat(), ...input.sitemap, ...input.robots];
-  const checks: CheckExecution[] = [
-    ...input.files.map((file, i) =>
-      check('CANONICAL', 'canonical', relative(input.directory, file).split(sep).join('/'),
-        'static-html', input.canonical[i]!,
-        'Assumes generated paths correspond to public URLs; intentional non-self canonicals need policy support.')),
-    check('SITEMAP', 'sitemap', input.siteUrl, 'local-sitemap-basic', input.sitemap,
-      'Local sitemap XML is partially parsed; no remote sitemap fetch or full XML validation.'),
-    check('ROBOTS', 'robots', input.siteUrl, 'local-robots-basic', input.robots,
-      'Simple local robots directives only; full user-agent group precedence is not validated.'),
-    ...NOT_IMPLEMENTED.map(({ ruleId, category, note }) => ({
-      ruleId, category, target: input.siteUrl, status: 'not-tested' as const,
-      method: 'not-implemented', findingIds: [], note,
-    })),
-  ];
+  const checks: CheckExecution[] = [];
+  const skippedRules: SkippedRule[] = [];
+  const executedRules: RuleId[] = [];
+  for (const rule of RULES) {
+    if (!selected.has(rule.id) || !rule.implemented) {
+      const reason = selected.has(rule.id) ? 'not-implemented' : 'excluded-by-profile';
+      skippedRules.push({ ruleId: rule.id, reason });
+      checks.push({
+        ruleId: rule.id, category: rule.category, target: input.siteUrl,
+        status: 'not-tested', method: reason, findingIds: [],
+        note: reason === 'not-implemented' ? rule.note : 'Rule is excluded by the active profile/configuration.',
+      });
+    } else {
+      executedRules.push(rule.id);
+      if (rule.id === 'CANONICAL') {
+        checks.push(...input.files.map((file, index) =>
+          check(rule.id, relative(input.directory, file).split(sep).join('/'),
+            rule.method, input.canonical[index]!, rule.note)));
+      } else if (rule.id === 'SITEMAP') {
+        checks.push(check(rule.id, input.siteUrl, rule.method, input.sitemap, rule.note));
+      } else if (rule.id === 'ROBOTS') {
+        checks.push(check(rule.id, input.siteUrl, rule.method, input.robots, rule.note));
+      }
+    }
+  }
   const count = (status: CheckStatus): number => checks.filter(c => c.status === status).length;
   const coverage = {
     total: checks.length,
@@ -64,14 +89,27 @@ export function buildAuditResult(input: {
     recommendations: count('recommendation'),
     notTested: count('not-tested'),
   };
+  const sourceCandidate = input.sourceCommit ?? process.env.WQT_SOURCE_COMMIT ?? null;
+  const sourceCommit = sourceCandidate && /^[0-9a-f]{40}$/i.test(sourceCandidate)
+    ? sourceCandidate : null;
   return {
     schemaVersion: 2,
     toolVersion: TOOL_VERSION,
     generatedAt: input.generatedAt ?? new Date().toISOString(),
     input: { directory: input.directory, siteUrl: input.siteUrl },
     scannedPages: input.files.length,
-    passedPages: input.canonical.filter(f => f.length === 0).length,
+    passedPages: selected.has('CANONICAL') ? input.canonical.filter(f => !f.length).length : 0,
     checks, coverage, findings,
+    manifest: {
+      surface: 'local-build',
+      profile,
+      configPath: input.configPath ?? null,
+      nodeVersion: process.version,
+      sourceCommit,
+      selectedRules: RULES.filter(r => selected.has(r.id)).map(r => r.id),
+      executedRules,
+      skippedRules,
+    },
   };
 }
 
@@ -83,21 +121,26 @@ function jsonBlock(value: unknown): string {
 }
 
 export function toMarkdown(result: AuditResult): string {
-  const { coverage } = result;
+  const { coverage, manifest } = result;
   const lines = [
     '# Web Quality Toolkit — technical SEO audit', '',
     `- Tool: **v${result.toolVersion}** / schema **v${result.schemaVersion}**`,
     `- Site origin: **${result.input.siteUrl}**`,
-    `- Scanned HTML pages: **${result.scannedPages}**`,
-    `- Canonical-passing pages only: **${result.passedPages}**`,
+    `- Profile: **${manifest.profile}** (local-build only)`,
+    `- Scanned HTML files: **${result.scannedPages}**`,
+    `- Canonical-passing pages only: **${result.passedPages}** (0 also means canonical may be excluded)`,
     `- Findings (including advice): **${result.findings.length}**`,
     `- Checks executed: **${coverage.executed}** / ${coverage.total}`,
-    `- Checks not tested: **${coverage.notTested}**`, '',
+    `- Checks not tested: **${coverage.notTested}**`,
+    `- Executed rule families: ${manifest.executedRules.join(', ') || 'none'}`,
+    `- Source commit: ${manifest.sourceCommit ?? 'unavailable'}`, '',
     '## Coverage by check', '',
     '| Rule family | Target | Status | Method |',
     '|---|---|---|---|',
     ...result.checks.map(c => `| ${c.ruleId} | ${c.target.replace(/\|/g, '\\|')} | ${c.status} | ${c.method} |`),
-    '', '## Limitations and skipped checks', '',
+    '', '## Skipped rules', '',
+    ...manifest.skippedRules.map(r => `- **${r.ruleId}**: ${r.reason}`),
+    '', '## Limitations', '',
     ...result.checks.filter(c => c.note).map(c => `- **${c.ruleId}** (${c.target}): ${c.note}`),
     '', '## Findings', '',
     ...(result.findings.length ? result.findings.flatMap(f => [

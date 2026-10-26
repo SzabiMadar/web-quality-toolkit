@@ -1,57 +1,103 @@
-# Web Quality Toolkit — v0.3.0 — technical SEO foundation
+# Web Quality Toolkit — v0.4.0 (A2)
 
-Portable TypeScript static/Astro-build audit with canonical, **partial** sitemap and robots.txt checks; versioned audit coverage; and a Devin plugin with specialist skills.
+TypeScript/Node.js alapú, újrafelhasználható **lokális HTML/Astro build SEO-audit**; külön Devin plugin és egyértelmű audit-lefedettségi riportok.
 
-## Requirements
-- Node.js >= 22.6 (Node.js 22 or newer recommended)
-- npm
-- Existing HTML build output (`dist/`) from a **trusted** project
+**Jelenleg végrehajtott ellenőrzések:** canonical; egyszerű sitemap (Astro sitemap index is); részleges robots.txt. **Nem létezik még végrehajtható AEO/GEO, JSON-LD, hreflang, image, performance, akadálymentességi vagy HTTP-crawler modul.**
 
-## Quick start
+## Követelmények
+
+- Node.js >= 22.6, npm
+- Megbízható weboldal elkészült statikus buildje (pl. `dist/`)
+- A weboldal ellenőrzött **valódi éles URL-je**, nem placeholder
+
+## Korábbi CLI-használat — továbbra is működik
 
 ```bash
 npm test
-npm run audit -- --dir /absolute/path/to/project/dist --site https://YOUR-CONFIRMED-PRODUCTION-ORIGIN/ --out /absolute/path/to/project/audits/latest
+npm run audit -- --dir /absolute/path/to/site/dist --site https://REAL-PRODUCTION-DOMAIN.example/ --out /absolute/path/to/site/audits/latest
 ```
 
-Replace placeholders with real paths and the confirmed canonical site origin (including any subpath); never issue a customer report from placeholder URLs.
+Az audit **nem** kéri le az éles weboldalt: kizárólag a helyi HTML/XML/robots fájlokat vizsgálja. Az `--site` az elvárt canonical/sitemap URL-ek meghatározásához kell. A példadomain helyére az ügyfél valódi domainjét kell írni.
 
-Output files: `findings.json` (schemaVersion **2**) and `summary.md`.
+## A2: JSON-projektkonfiguráció
 
-Exit codes: **0** no confirmed/review-required issues (advice alone does not fail), **1** confirmed findings or needs-review findings, **2** execution error.
+Másold az [examples/web-quality.config.example.json](examples/web-quality.config.example.json) példát a **vizsgált projekt** mappájába, szükség szerint módosítsd, például `web-quality.config.json` néven. A toolkit nem írja módosítja a projektet; a fájlt te készíted el.
 
-### Report schema v2 migration
+```json
+{
+  "configVersion": 1,
+  "site": "https://example.com/",
+  "dir": "./dist",
+  "out": "./audits/latest",
+  "profile": "full",
+  "rules": {
+    "include": [],
+    "exclude": []
+  }
+}
+```
 
-Existing fields `schemaVersion`, `generatedAt`, `input`, `scannedPages`, `passedPages`, `findings` are retained. The **new** fields are:
+Használat a **toolkit gyökérkönyvtárából**:
 
-- `toolVersion`: CLI release label.
-- `checks[]`: explicit per-page canonical and site-level sitemap/robots status and test method; unavailable rule families appear as `not-tested`.
-- `coverage`: totals for executed, passed, confirmed, needs-review, recommendation, and not-tested checks.
+```bash
+npm run audit -- --config /absolute/path/to/project/web-quality.config.json
+```
 
-`passedPages` remains for compatibility but **counts canonical-passing pages only**, never overall SEO health. Finding `status` now distinguishes `confirmed`, `needs-review`, and `recommendation`. `ROBOTS_MISSING` is advisory/info, and an apparent `ROBOTS_BLOCK_ALL` is marked for review because the current parser does not yet implement all robots group precedence rules.
+- Az `--config` **explicit**: nincs automatikus konfigurációkeresés, így egy véletlen fájl nem befolyásol futást.
+- A konfigurációban megadott relatív `dir` és `out` útvonalak a **konfigurációs fájl könyvtárához** képest értendők.
+- A CLI-n megadott `--dir`, `--out`, `--site`, `--profile` mindig **felülírja** a JSON megfelelő értékét; relatív CLI-útvonalak az aktuális munkakönyvtárhoz viszonyítottak.
+- A JSON kulcsok és a szabályazonosítók szigorúan validáltak. Ismeretlen érték, ütköző `include/exclude`, hibás URL vagy hibás JSON esetén a futtatás **2-es kóddal** leáll.
+- `include`: szabályt ad a profilhoz; `exclude`: eltávolítja. Nem implementált szabály kérése **nem indít ellenőrzést**, hanem `not-tested` státuszt ad.
+- A konfiguráció nem futtatható TypeScript/JS, hanem egyszerű JSON; nincsenek benne parancsok, kulcsok vagy titkok.
 
-The test engine does **not** yet check live HTTP status, hreflang, metadata, links, JSON-LD, images, Lighthouse, accessibility or actual AI citations. These are explicitly present in `checks[]` as `not-tested`; they are **not successes**.
+## Auditprofilok
 
-### Scope
+| Profil | Jelenlegi működés | Korlát |
+|---|---|---|
+| `full` (alapértelmezett) | Canonical + alap sitemap + alap robots ellenőrzés | További 9 modul `not-tested` |
+| `quick` | Csak canonical ellenőrzés | A kihagyott modulok `excluded-by-profile` |
+| `content` | **Még nincs végrehajtható vizsgálat** | A kiválasztott METADATA, SCHEMA, AEO_GEO is `not-implemented` |
 
-Canonical parsing is a pragmatic HTML attribute matcher, not a browser-grade parser. The expected URL mapping favors Astro directory output, and intentional canonical aliases require manual review. The sitemap XML parser and robots group parser are limited. No remote HTTP request is made.
+Példák:
+
+```bash
+npm run audit -- --config /path/to/project/web-quality.config.json --profile quick
+npm run audit -- --dir /path/to/site/dist --site https://real-domain.example/ --profile content
+```
+
+A `content` profil `0` exit code-ja **nem tartalmi megfelelést** jelent, hanem azt, hogy nincs végrehajtott, hibát jelző ellenőrzés. A `coverage.executed = 0` ezt egyértelművé teszi.
+
+## Auditriport és manifest
+
+Kimeneti fájlok: `findings.json` (`schemaVersion: 2`) és `summary.md`. A korábbi mezőket megtartjuk, az A2 egy additív `manifest` objektumot vezet be:
+
+- `profile`, `surface: local-build`, `configPath`
+- `selectedRules`, `executedRules`
+- `skippedRules` és `excluded-by-profile` / `not-implemented` okok
+- `nodeVersion`, `sourceCommit` (csak `WQT_SOURCE_COMMIT` 40 karakteres SHA esetén; egyébként `null`)
+
+A `coverage` az adott profilhoz tartozó ténylegesen végrehajtott és ki nem próbált **ellenőrzési egységeket** számolja. A régi `passedPages` kizárólag a canonical-vizsgálat során sikeres oldalak száma; nullának számít akkor is, ha a canonical nem futott.
+
+**Exit code-ok:** 0 = nincs bizonyított vagy további vizsgálatot igénylő megállapítás; 1 = van confirmed/needs-review megállapítás; 2 = futtatási hiba. A 0 nem teljes SEO-tanúsítvány.
 
 ## Devin plugin
+
+A `plugins/web-audit` plugin jelenlegi verziója **0.3.0**. Az A2 a plugin fájljait nem módosítja, ezért a korábban importált `/web-audit:full-audit` parancs továbbra is a korábbi `--dir --site --out` CLI-formát használhatja. A plugin **nem telepíti** önmagában a CLI-t.
 
 ```bash
 devin plugins install --local ./plugins/web-audit
 devin plugins list
 ```
 
-Open a new Devin Agent session and invoke `/web-audit:full-audit`. The separate plugin version is currently **0.3.0**; refresh it and validate the workflow in your own Devin environment after toolkit changes. A plugin is an orchestration skill, **not** a bundled CLI installer. A GitHub-subdirectory install may use `devin plugins install SzabiMadar/web-quality-toolkit#plugins/web-audit`.
+Az éles Devin Desktop integrációt az új verzióval a saját környezetben külön ellenőrizni kell.
 
-## Documentation
+## Dokumentáció és fejlesztési terv
 
-- [Master plan](docs/PROJECT_PLAN.md)
-- [Implementation roadmap](docs/ROADMAP.md)
-- [Implemented/planned rule catalog](docs/RULE_CATALOG.md)
-- [Reference repositories and licensing](docs/REFERENCE_ADOPTION.md)
+- [Teljes projektterv](docs/PROJECT_PLAN.md)
+- [Fejlesztési roadmap](docs/ROADMAP.md)
+- [Szabálykatalógus](docs/RULE_CATALOG.md)
+- [Referencia-repók](docs/REFERENCE_ADOPTION.md)
 
-## Safety
+A jelenlegi HTML/canonical és sitemap/robots parser részleges; ezek robusztusabb validátorokra történő lecserélése a következő fejlesztési fázis része.
 
-Audit output can contain raw URLs and HTML-derived values. Review before sharing. Do not run unknown build scripts, install dependencies, deploy, invoke cloud agents, or fetch unrelated hosts without appropriate authorization.
+**Biztonság:** ne futtass ismeretlen buildscriptet engedély nélkül, és ne publikálj ügyfél URL-eket, hitelesítési adatokat vagy privát HTML-t a nyilvános repositoryba.

@@ -6,7 +6,9 @@
 > **Rendeltetés:** tartós projektleírás ChatGPT, Codex és Devin számára.  
 > **Kapcsolódó fájlok:** [ROADMAP.md](./ROADMAP.md), [RULE_CATALOG.md](./RULE_CATALOG.md), [REFERENCE_ADOPTION.md](./REFERENCE_ADOPTION.md).
 
-Ez a dokumentum rögzíti a Web Quality Toolkit célját, MVP-jét, technikai architektúráját, a referenciaként vizsgált nyílt forráskódú projekteket, a GitHubon ténylegesen meglévő implementációt és a fejlesztés következő lépéseit. **Nem állítja, hogy a tervezett funkciók már működnek.** Az eredeti, ideiglenes beszélgetés nem érhető el; a tervezet a repóban megőrzött döntésekből és a frissen ellenőrzött referenciákból készült.
+Ez a dokumentum rögzíti a Web Quality Toolkit célját, MVP-jét, technikai architektúráját, a referenciaként vizsgált nyílt forráskódú projekteket, a GitHubon ténylegesen meglévő implementációt és a fejlesztés következő lépéseit.
+
+**Fejlesztési frissítés (2026-10-26):** az A1 (CLI v0.3.0) és az A2 (CLI v0.4.0) implementációja elkészült. Az A2 JSON-konfigurációt, quick/full/content profilokat és auditmanifestet vezet be. A működő technikai SEO-szabályok változatlanul a canonical, alap sitemap és alap robots körre korlátozódnak. A későbbi AEO/GEO és Content-futtatás továbbra is tervezett. **Nem állítja, hogy a tervezett funkciók már működnek.** Az eredeti, ideiglenes beszélgetés nem érhető el; a tervezet a repóban megőrzött döntésekből és a frissen ellenőrzött referenciákból készült.
 
 ## 1. Mi a feladat, és miért építjük?
 
@@ -258,16 +260,16 @@ A platformintegrációk egyazon CLI-n és JSON-adatformátumon osztoznak. Nem k�
 
 ## 8. Fejlesztési roadmap — prioritással
 
-### A. fázis: közös eredménymodell (KÖVETKEZŐ)
+### A. fázis: közös eredménymodell (A1 és A2 teljesítve, további bővítés később)
 
-- [ ] A Finding modell áttervezése.
-- [ ] Állapotok: passed, confirmed, needs-review, recommendation, not-tested.
-- [ ] Súlyosság és végrehajtási státusz elválasztása.
-- [ ] Szabályszintű és URL-szintű lefedettség.
-- [ ] Auditmanifest: tool/schema-verzió, futtatott/kimaradt tesztek, környezet.
-- [ ] Visszamenőleges kompatibilitás és schemaVersion-váltás.
-- [ ] Konfiguráció, quick/full/content profilok alapjai.
-- [ ] Regressziós tesztek és meglévő auditok változatlan működése.
+- [x] A Finding modell áttervezése.
+- [x] Állapotok: passed, confirmed, needs-review, recommendation, not-tested.
+- [x] Súlyosság és végrehajtási státusz elválasztása.
+- [x] Szabálycsaládok és canonical URL-ek végrehajtási lefedettsége (A1).
+- [x] Auditmanifest: tool/schema-verzió, profil, futtatott/kimaradt tesztek, Node-verzió és opcionális commit SHA (A2).
+- [x] A1 schemaVersion 2, az A2 során additív manifestbővítés.
+- [x] JSON-konfiguráció, quick/full/content profilok, include/exclude szabályválasztás (A2).
+- [x] Regressziós tesztek GitHub Actions alatt.
 
 **Elfogadási feltétel:** minden régi modul az új közös eredményrendszerben működik; a ki nem tesztelt szabály soha nem válik automatikusan sikeressé; a riport megmutatja a lefedettséget.
 
@@ -350,4 +352,4 @@ A1 kész, ha a jelenlegi tesztfunkciók megmaradnak, a riport nem állít teljes
 - **REFERENCE_ADOPTION.md:** a ténylegesen elemzett/átvett külső megoldások indoklása, licenc- és eredetnyilvántartás.
 - **AGENTS.md:** végrehajtási és biztonsági szabályok az AI-agenteknek.
 
-**Következő lépés:** A1 — a közös, bizonyíték- és lefedettségközpontú TypeScript auditmodell megvalósítása. Nem kell most a Devint újraépíteni, és nem szükséges összes külső repót telepíteni.
+**Következő lépés:** a B fázis — robusztus HTML/XML-feldolgozás, robots szabályprecedencia, majd hreflang és metadata. A `content` profil jelenleg még nem végez AI-vizsgálatot; a Devinben telepített plugin tényleges futtatását külön kell validálni.
