@@ -14,8 +14,9 @@ One reusable read-only-by-default audit workflow usable through Devin Desktop, C
 - [x] Review three reference repositories and their licenses; record adoption decisions (`REFERENCE_ADOPTION.md`).
 - [x] Initialize central GitHub repository with current baseline.
 - [x] Schema v2: finding statuses (`confirmed`, `needs-review`, `recommendation`), per-target check statuses (`passed`, `not-tested` included), explicit coverage counts, CLI v0.3.0 tool version and GitHub Actions regression tests (A1).
-- [ ] Full audit manifest: source commit, complete rule coverage, richer execution metadata and migration tooling.
-- [ ] Project configuration and `quick` / `full` / `content` profiles.
+- [x] A2 audit manifest: CLI version, profile, configured/selected/executed/skipped rule families, skip reasons, local-build surface, Node version and optional explicitly supplied source commit (CLI v0.4.0).
+- [x] A2 JSON project configuration, validated rule include/exclude and `quick` / `full` / `content` profiles (CLI v0.4.0).
+- [ ] Future manifest enhancements: reproducible input fingerprints, complete rule-level provenance, richer timing metadata and migration tooling. Source commit is `null` unless `WQT_SOURCE_COMMIT` is provided.
 
 ## Phase 2 — Complete technical SEO MVP
 
@@ -46,7 +47,8 @@ One reusable read-only-by-default audit workflow usable through Devin Desktop, C
 
 ## Phase 5 — CI, regression and client delivery
 
-- [ ] GitHub Actions automated tests/audits.
+- [x] GitHub Actions Node.js 22 test suite and CLI smoke audit for PRs and `main`.
+- [ ] Configurable CI audits on real client build output with quality gates.
 - [ ] Audit diffs and quality gates; deterministic manifest.
 - [ ] Client-friendly HTML/PDF reports and screenshots.
 - [ ] Optional Search Console integration.
