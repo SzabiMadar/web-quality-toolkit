@@ -4,7 +4,7 @@
 
 ## Gyors indulás Devinben
 
-**Devin plugin: web-audit v1.0.0.** A plugin gyökere: [plugins/web-audit](plugins/web-audit/).
+**Devin plugin: web-audit v1.1.0.** A plugin gyökere: [plugins/web-audit](plugins/web-audit/).
 
 Ha már korábban importáltad:
 
@@ -25,10 +25,18 @@ Indíts friss Devin munkamenetet; ellenőrizd, hogy elérhető-e a **/web-audit:
 
 > Futtasd a /web-audit:full-audit skillt az aktuális weboldalprojekten. Csak olvass, semmit ne módosíts. SEO, AEO/GEO, performance és accessibility területeken csak ténylegesen elérhető adatból dolgozz; a hiányzó eszközök/ellenőrzések legyenek not-tested. Adj magyar nyelvű, URL-enként bizonyított és priorizált javítási tervet.
 
-**14 önálló skill:**
-full-audit, quick-audit, technical-seo, on-page-seo, international-seo, structured-data, internal-links, image-audit, performance, accessibility, content-seo, aeo-geo, local-seo, audit-report.
+**19 önálló skill:**
+full-audit, quick-audit, technical-seo, on-page-seo, international-seo, structured-data, internal-links, image-audit, performance, accessibility, content-seo, aeo-geo, local-seo, audit-report, sxo, ecommerce-seo, seo-drift, content-brief, agent-readiness.
 
 Részletes telepítési és parancslista: [Plugin README](plugins/web-audit/README.md) és [Skillset használata](docs/SKILLSET_USAGE.md).
+
+## Az új v1.1.0 képességek
+
+A korábbi 14 skill mellé öt új modul került: **SXO (keresési szándék × felhasználói élmény)**, **e-commerce SEO**, **SEO-drift (valós baseline-összehasonlítás)**, **SEO content brief**, **AI-agent readiness**. A full-audit most a webhely valódi típusa alapján választja ki őket, nem futtat webshopos ellenőrzést minden projekten.
+
+Három új, külső függőségek nélküli Node-eszköz: metadata-sablonminták, potenciálisan hivatkozás nélküli állítások és két meglévő audit-pillanatkép összehasonlítása. Egyik sem kér le internetes oldalakat. Használat és inputok: [TOOLS.md](docs/TOOLS.md).
+
+**A CLI továbbra is v0.4.0.** A pluginban szereplő 19 skill eljárás; a CLI csak az általa megvalósított ellenőrzéseket futtatja.
 
 ## Webes ChatGPT
 
@@ -41,7 +49,7 @@ Codex / más agent: [integrációs útmutató](integrations/codex/README.md).
 | Funkció | Státusz |
 |---|---|
 | Skillalapú SEO, AEO/GEO, tartalom, hreflang, schema, accessibility, performance értelmezés | **Kész, eljárásként**; valós forrásokon ténylegesen alkalmazni kell |
-| Devin plugin és 14 feladat-skill, közös protokoll és riportminta | **Elkészült**, szerkezeti CI-validációval |
+| Devin plugin és 19 feladat-skill, közös protokoll és riportminta | **Elkészült**, 19 skill szerkezeti CI-validációval |
 | Webes ChatGPT által olvasható módszertan | **Elkészült**; beolvasáshoz a GitHubhoz való tényleges hozzáférés kell |
 | TypeScript CLI v0.4.0: canonical, alap sitemap és robots | **Meglévő, korlátozott** determinista ellenőrző |
 | Automatikus hreflang, schema, image, CWV, WCAG, GEO hivatkozásmérés | **Nincs beépítve**; külső eszköz/adat vagy szakmai ellenőrzés kell |

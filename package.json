@@ -8,7 +8,8 @@
   },
   "scripts": {
     "audit": "node --experimental-strip-types src/cli.ts",
-    "test": "node --experimental-strip-types --test tests/*.test.ts && node scripts/validate-skills.mjs",
-    "test:skills": "node scripts/validate-skills.mjs"
+    "test": "node --experimental-strip-types --test tests/*.test.ts && node --test tests/tools.test.mjs && node scripts/validate-skills.mjs",
+    "test:skills": "node scripts/validate-skills.mjs",
+    "test:tools": "node --test tests/tools.test.mjs"
   }
 }

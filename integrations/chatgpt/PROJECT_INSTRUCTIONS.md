@@ -20,3 +20,14 @@ Először azonosítsd az aktuálisan elérhető forrásokat és eszközöket (p�
 ## Korlátok
 
 Nincs garancia, hogy az aktuális ChatGPT munkamenet közvetlenül el tudja érni a GitHubot vagy helyi buildet. Ha nem, a szükséges fájlt/linket külön kell elérhetővé tenni, és az ismeretlen tényeket jelölni. A ChatGPT-nek a Devin slash commandok nem automatikus saját parancsai.
+
+## Új v1.1.0 modulok
+
+Az új skillek a GitHub plugins/web-audit/skills mappájában:
+- sxo: keresési szándék, oldaltípus, valódi látogatói feladatok és UX.
+- ecommerce-seo: webshop- és Merchant ellenőrzések termék/variáns oldalakon.
+- seo-drift: két adott időpontból ténylegesen rendelkezésre álló audit-eredmény összehasonlítása.
+- content-brief: új/megújítandó szolgáltatási oldal vagy cikk szakmai terve.
+- agent-readiness: AI-agentek által használható navigáció/űrlapok, opcionális protokollok.
+
+Teljes audit esetén kérd a full-audit SKILL.md fájlt is; annak feltételes modulválasztási táblája határozza meg, mi releváns. A három opcionális Node-fájl (scripts/check-metadata.mjs, check-claims.mjs, compare-snapshots.mjs) csak olyan környezetben futtatható, ahol tényleges Node és a felhasználó által megadott bemeneti fájlok rendelkezésre állnak. A webes ChatGPT-ben **ne állítsd**, hogy ezek automatikusan lefutottak.

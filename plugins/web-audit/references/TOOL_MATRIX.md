@@ -14,3 +14,13 @@ Reference methods: https://github.com/coreyhaines31/marketingskills ,
 https://github.com/AgriciDaniel/claude-seo ,
 https://github.com/seoskillsai/seo-skills-ai .
 External executables are examples, **not** installed/bundled dependencies.
+
+## v1.1 local-only analysis helpers
+
+| Function | Optional CLI (from parent repository, not bundled as plugin binary) | Boundary |
+|---|---|---|
+| Metadata duplication/templating | scripts/check-metadata.mjs | Only user-supplied page-pair JSON; editorial heuristic |
+| Potentially uncited assertions | scripts/check-claims.mjs | HU/EN regex patterns; not a fact-check |
+| SEO drift | scripts/compare-snapshots.mjs | Two user-supplied equivalent snapshots; no active crawling or scheduling |
+
+SXO, e-commerce, content briefing and agent readiness are procedure skills. Real SERP, Merchant Center, checkout, Lighthouse and agent browser evidence require separate authorized tools.

@@ -1,6 +1,6 @@
-# Web Audit — Devin skill plugin v1.0.0
+# Web Audit — Devin skill plugin v1.1.0
 
-Portable, read-only first website quality **skills**. This directory (not the repository root) is the installable Devin plugin, with its own manifest and 14 independent skills.
+Portable, read-only first website quality **skills**. This directory (not the repository root) is the installable Devin plugin, with its own manifest and 19 independent skills.
 
 ## Install/update for all your Devin projects
 
@@ -39,6 +39,11 @@ Examples of skill slash commands after a verified install:
 - /web-audit:aeo-geo — qualitative AI-search readiness;
 - /web-audit:local-seo — local business information;
 - /web-audit:audit-report — consolidate and prioritize evidence.
+- /web-audit:sxo — user intent, page type and conversion path review;
+- /web-audit:ecommerce-seo — product, variant and merchant markup reviews;
+- /web-audit:seo-drift — compare actual baseline/current snapshots;
+- /web-audit:content-brief — researched new/refresh page writing brief;
+- /web-audit:agent-readiness — semantic UI and agent access review.
 
 ## First prompt example
 
@@ -55,6 +60,18 @@ npm run audit -- --dir /ABSOLUTE/PATH/TO/dist --site https://REAL-DOMAIN.example
 ~~~
 
 Read findings.json and summary.md. The CLI v0.4.0 full/content profiles **do not perform** the broad methods of these human/agent skills; its content profile executes zero tests.
+
+## Optional local-file checks (no extra dependencies)
+
+From the **toolkit repository root**, with real permitted inputs:
+
+~~~bash
+node scripts/check-metadata.mjs /ABSOLUTE/PATH/pages.json
+node scripts/check-claims.mjs /ABSOLUTE/PATH/article.txt
+node scripts/compare-snapshots.mjs /ABSOLUTE/PATH/before.json /ABSOLUTE/PATH/after.json
+~~~
+
+These **do not** scrape or download pages and do not establish actual Google rankings, factual correctness or performance. Documentation: ../../docs/TOOLS.md. All 19 skills work as procedures without these helpers.
 
 ## Design and safety
 

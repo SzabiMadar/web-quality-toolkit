@@ -2,7 +2,7 @@
 
 ## Mi készült el?
 
-A **Devin plugin v1.0.0** 14 eljárásskillt tartalmaz. A szakmai útmutatók hordozhatók; a telepítés és eszközhozzáférés platformfüggő. Az audit a rendelkezésre álló weboldal- vagy projektadatból készül.
+A **Devin plugin v1.1.0** 19 eljárásskillt tartalmaz. A szakmai útmutatók hordozhatók; a telepítés és eszközhozzáférés platformfüggő. Az audit a rendelkezésre álló weboldal- vagy projektadatból készül.
 
 ### Kiválasztási példa
 
@@ -22,6 +22,11 @@ A **Devin plugin v1.0.0** 14 eljárásskillt tartalmaz. A szakmai útmutatók ho
 | AEO/GEO felkészültség | /web-audit:aeo-geo |
 | Helyi vállalkozások SEO-ja | /web-audit:local-seo |
 | Összesítés és javítási terv | /web-audit:audit-report |
+| Keresési szándék és UX/SXO | /web-audit:sxo |
+| Webshop, Product schema, variánsok | /web-audit:ecommerce-seo |
+| Két audit összehasonlítása | /web-audit:seo-drift |
+| Új vagy frissítendő tartalom brief | /web-audit:content-brief |
+| AI-agent böngészési és műveleti alkalmasság | /web-audit:agent-readiness |
 
 **Fontos:** a skill nem garantál valódi Lighthouse/Search Console/AI mérőeszközt. Ahol nincs végrehajtott teszt vagy hiteles adat, ott not-tested.
 
@@ -49,6 +54,14 @@ Indíts új munkamenetet, majd keresd /web-audit:full-audit és /web-audit:inter
 **Kétnyelvű ügyvédi iroda:** "A /web-audit:international-seo és /web-audit:structured-data módszertannal vizsgáld át a magyar–angol oldalakat, kérlek bizonyítsd az alternates viszonosságát URL-páronként."
 
 **Ügyfélriport:** "Futtasd a /web-audit:audit-report skillt a már elkészült findings.json és a megadott forrásmegfigyelések alapján; sorold prioritás szerint, mit kell javítani."
+
+## V1.1 új helyi ellenőrzők
+
+- node scripts/check-metadata.mjs pages.json
+- node scripts/check-claims.mjs article.txt
+- node scripts/compare-snapshots.mjs baseline.json current.json
+
+Ezek már létező fájlokat olvasnak, nem crawlerek. Részletes példák: docs/TOOLS.md.
 
 ## Reális készültség
 

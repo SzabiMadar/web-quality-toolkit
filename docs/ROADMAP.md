@@ -1,3 +1,17 @@
+# Portable skillset v1.1.0 — 2026-10-26
+
+- [x] Five new SKILL.md modules: sxo, ecommerce-seo, seo-drift, content-brief, agent-readiness (19 total).
+- [x] Full-audit applies context-triggered specialist routing.
+- [x] Review claude-seo SXO, commerce, drift, content, agentic scripts and cautionary signals; record adoption/licence boundaries.
+- [x] Optional zero-dependency local Node helpers: metadata, citation-gap candidates, snapshot diff.
+- [x] Unit + CLI tests and skill package validation added to GitHub CI.
+- [ ] Real user verifies Devin Desktop plugin refresh to v1.1.0.
+- [ ] One real-site audit in Devin and one accessible-source ChatGPT audit; no invented measurements.
+
+The independent local TypeScript CLI remains v0.4.0. This release does **not** add actual crawlers, new deterministic SEO rule families or live API integrations. Below are historical roadmap milestones and optional long-term CLI backlog.
+
+---
+
 # Portable skillset v1 — delivery status
 
 - [x] Devin plugin 1.0.0 with 14 modular SKILL.md instructions.
