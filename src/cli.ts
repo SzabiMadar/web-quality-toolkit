@@ -3,6 +3,7 @@ import { resolve, join } from 'node:path';
 import { checkCanonical, htmlFiles } from './canonical.ts';
 import { checkSitemap } from './sitemap.ts';
 import { checkRobots } from './robots.ts';
+import { checkMetadata } from './metadata.ts';
 import type { AuditResult } from './types.ts';
 
 function arg(name: string): string | undefined {
@@ -22,7 +23,7 @@ async function main(): Promise<void> {
   const files = await htmlFiles(directory);
   if (!files.length) throw new Error(`No HTML files found in ${directory}`);
   const all = await Promise.all(files.map(file => checkCanonical(file, directory, parsed.href)));
-  const extra = await Promise.all([checkSitemap(directory, parsed.href, files), checkRobots(directory, parsed.href)]);
+  const extra = await Promise.all([checkSitemap(directory, parsed.href, files), checkRobots(directory, parsed.href), ...files.map(file => checkMetadata(file, directory))]);
   const findings = [...all.flat(), ...extra.flat()];
   const result: AuditResult = {
     schemaVersion: 1,
