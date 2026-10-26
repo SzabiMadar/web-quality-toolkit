@@ -32,3 +32,7 @@ All three root repositories published an MIT `LICENSE` file at the time of revie
 - [Astro docs](https://docs.astro.build/)
 
 This inventory is a snapshot. Do not automatically treat any upstream project's guidance, star count or README claim as evidence of a search engine ranking factor.
+
+## Portable skillset v1 (2026-10-26)
+
+The primary deliverable is now the Devin skill plugin under plugins/web-audit, consisting of **independently written instructions**, not imported upstream source or runnable upstream SEO tools. The original three projects above remain **methodological** references. Lighthouse (GoogleChrome/lighthouse), Playwright (microsoft/playwright), axe-core (dequelabs/axe-core) and Linkinator (JustinBeckwith/linkinator) are **optional integrations**, not installed plugin dependencies. No license-covered third-party code or full SKILL.md was copied as part of this release. Refer to docs/SKILLSET_RELEASE.md for scope and limitations.

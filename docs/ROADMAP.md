@@ -1,3 +1,17 @@
+# Portable skillset v1 — delivery status
+
+- [x] Devin plugin 1.0.0 with 14 modular SKILL.md instructions.
+- [x] Unified evidence protocol, report template and optional tool matrix.
+- [x] ChatGPT/Codex documentation and copyable prompts.
+- [x] Automated static skill validation integrated into npm test / GitHub CI.
+- [ ] Human verification that the user's existing Devin Desktop installation has refreshed to 1.0.0.
+- [ ] One read-only audit on a real site in Devin and one ChatGPT audit with actual accessible sources.
+- [ ] **Optional only:** automate additional technical rules and browser checks, if real usage demonstrates a need.
+
+---
+
+> **Fókuszfrissítés — 2026-10-26:** Az elsődleges termék most a **hordozható Web Audit skillset v1.0.0**, nem egy új SEO crawler. A 14 Devin skill, a közös protokoll, riportminta és a ChatGPT/Codex használati útmutató elkészült. A TypeScript CLI v0.4.0 opcionális segédeszköz marad. Az alábbi korábbi, teljes technikai automata motorra vonatkozó feladatok **nem automatikusan készültek el**; szükség esetén külön termékfejlesztésként kezeljük őket.
+
 # Web Quality Toolkit — implementation roadmap
 
 This is the practical implementation checklist based on the project's **Universal SEO/AEO/GEO Audit Toolkit, Concept 1.0 (2026-10-26)**. The plan's requirements remain authoritative; this file tracks implementation status only.

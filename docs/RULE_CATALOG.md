@@ -1,3 +1,5 @@
+> Skillset v1: technical-seo, international-seo, schema, performance, content and other skills are **professional review procedures** in plugins/web-audit/skills. Their existence does **not** turn the corresponding CLI rules into implemented tests. The table below refers specifically to the independent CLI v0.4.0.
+
 # SEO/AEO/GEO rule inventory
 
 This catalog is intentionally honest about current executable coverage. `Implemented (partial)` means the check is executable but not a complete validator. `Planned` or `manual` must **not** be reported as passed by `npm run audit`.

@@ -1,5 +1,13 @@
 {
   "name": "web-audit",
-  "version": "0.3.0",
-  "description": "Read-only, evidence-driven web quality audit skills for Astro and static websites"
+  "version": "1.0.0",
+  "description": "Reusable SEO, AEO/GEO, accessibility, performance and website quality audit skillset for Devin",
+  "homepage": "https://github.com/SzabiMadar/web-quality-toolkit",
+  "repository": "https://github.com/SzabiMadar/web-quality-toolkit",
+  "keywords": [
+    "seo",
+    "aeo",
+    "geo",
+    "website-audit"
+  ]
 }

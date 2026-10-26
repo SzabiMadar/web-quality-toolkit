@@ -1,103 +1,70 @@
-# Web Quality Toolkit — v0.4.0 (A2)
+# Web Quality Toolkit — Universal Website Audit Skillset
 
-TypeScript/Node.js alapú, újrafelhasználható **lokális HTML/Astro build SEO-audit**; külön Devin plugin és egyértelmű audit-lefedettségi riportok.
+**A projekt elsődleges terméke egy hordozható AI-skillcsomag**, amelyet bármely weboldalprojekt átvizsgálásánál használhatsz Devin Desktopban, és a nyilvános SKILL.md fájlok alapján webes ChatGPT-ben vagy más agent környezetben is követhetsz. Az önálló TypeScript CLI megmarad opcionális, korlátozott technikai ellenőrzőként.
 
-**Jelenleg végrehajtott ellenőrzések:** canonical; egyszerű sitemap (Astro sitemap index is); részleges robots.txt. **Nem létezik még végrehajtható AEO/GEO, JSON-LD, hreflang, image, performance, akadálymentességi vagy HTTP-crawler modul.**
+## Gyors indulás Devinben
 
-## Követelmények
+**Devin plugin: web-audit v1.0.0.** A plugin gyökere: [plugins/web-audit](plugins/web-audit/).
 
-- Node.js >= 22.6, npm
-- Megbízható weboldal elkészült statikus buildje (pl. `dist/`)
-- A weboldal ellenőrzött **valódi éles URL-je**, nem placeholder
+Ha már korábban importáltad:
 
-## Korábbi CLI-használat — továbbra is működik
-
-```bash
-npm test
-npm run audit -- --dir /absolute/path/to/site/dist --site https://REAL-PRODUCTION-DOMAIN.example/ --out /absolute/path/to/site/audits/latest
-```
-
-Az audit **nem** kéri le az éles weboldalt: kizárólag a helyi HTML/XML/robots fájlokat vizsgálja. Az `--site` az elvárt canonical/sitemap URL-ek meghatározásához kell. A példadomain helyére az ügyfél valódi domainjét kell írni.
-
-## A2: JSON-projektkonfiguráció
-
-Másold az [examples/web-quality.config.example.json](examples/web-quality.config.example.json) példát a **vizsgált projekt** mappájába, szükség szerint módosítsd, például `web-quality.config.json` néven. A toolkit nem írja módosítja a projektet; a fájlt te készíted el.
-
-```json
-{
-  "configVersion": 1,
-  "site": "https://example.com/",
-  "dir": "./dist",
-  "out": "./audits/latest",
-  "profile": "full",
-  "rules": {
-    "include": [],
-    "exclude": []
-  }
-}
-```
-
-Használat a **toolkit gyökérkönyvtárából**:
-
-```bash
-npm run audit -- --config /absolute/path/to/project/web-quality.config.json
-```
-
-- Az `--config` **explicit**: nincs automatikus konfigurációkeresés, így egy véletlen fájl nem befolyásol futást.
-- A konfigurációban megadott relatív `dir` és `out` útvonalak a **konfigurációs fájl könyvtárához** képest értendők.
-- A CLI-n megadott `--dir`, `--out`, `--site`, `--profile` mindig **felülírja** a JSON megfelelő értékét; relatív CLI-útvonalak az aktuális munkakönyvtárhoz viszonyítottak.
-- A JSON kulcsok és a szabályazonosítók szigorúan validáltak. Ismeretlen érték, ütköző `include/exclude`, hibás URL vagy hibás JSON esetén a futtatás **2-es kóddal** leáll.
-- `include`: szabályt ad a profilhoz; `exclude`: eltávolítja. Nem implementált szabály kérése **nem indít ellenőrzést**, hanem `not-tested` státuszt ad.
-- A konfiguráció nem futtatható TypeScript/JS, hanem egyszerű JSON; nincsenek benne parancsok, kulcsok vagy titkok.
-
-## Auditprofilok
-
-| Profil | Jelenlegi működés | Korlát |
-|---|---|---|
-| `full` (alapértelmezett) | Canonical + alap sitemap + alap robots ellenőrzés | További 9 modul `not-tested` |
-| `quick` | Csak canonical ellenőrzés | A kihagyott modulok `excluded-by-profile` |
-| `content` | **Még nincs végrehajtható vizsgálat** | A kiválasztott METADATA, SCHEMA, AEO_GEO is `not-implemented` |
-
-Példák:
-
-```bash
-npm run audit -- --config /path/to/project/web-quality.config.json --profile quick
-npm run audit -- --dir /path/to/site/dist --site https://real-domain.example/ --profile content
-```
-
-A `content` profil `0` exit code-ja **nem tartalmi megfelelést** jelent, hanem azt, hogy nincs végrehajtott, hibát jelző ellenőrzés. A `coverage.executed = 0` ezt egyértelművé teszi.
-
-## Auditriport és manifest
-
-Kimeneti fájlok: `findings.json` (`schemaVersion: 2`) és `summary.md`. A korábbi mezőket megtartjuk, az A2 egy additív `manifest` objektumot vezet be:
-
-- `profile`, `surface: local-build`, `configPath`
-- `selectedRules`, `executedRules`
-- `skippedRules` és `excluded-by-profile` / `not-implemented` okok
-- `nodeVersion`, `sourceCommit` (csak `WQT_SOURCE_COMMIT` 40 karakteres SHA esetén; egyébként `null`)
-
-A `coverage` az adott profilhoz tartozó ténylegesen végrehajtott és ki nem próbált **ellenőrzési egységeket** számolja. A régi `passedPages` kizárólag a canonical-vizsgálat során sikeres oldalak száma; nullának számít akkor is, ha a canonical nem futott.
-
-**Exit code-ok:** 0 = nincs bizonyított vagy további vizsgálatot igénylő megállapítás; 1 = van confirmed/needs-review megállapítás; 2 = futtatási hiba. A 0 nem teljes SEO-tanúsítvány.
-
-## Devin plugin
-
-A `plugins/web-audit` plugin jelenlegi verziója **0.3.0**. Az A2 a plugin fájljait nem módosítja, ezért a korábban importált `/web-audit:full-audit` parancs továbbra is a korábbi `--dir --site --out` CLI-formát használhatja. A plugin **nem telepíti** önmagában a CLI-t.
-
-```bash
-devin plugins install --local ./plugins/web-audit
+~~~bash
+devin plugins update web-audit
 devin plugins list
-```
+~~~
 
-Az éles Devin Desktop integrációt az új verzióval a saját környezetben külön ellenőrizni kell.
+Ha nem frissíthető az adott Devin-verzióval, telepítsd újra a GitHub almappából:
 
-## Dokumentáció és fejlesztési terv
+~~~bash
+devin plugins install SzabiMadar/web-quality-toolkit#plugins/web-audit
+~~~
 
-- [Teljes projektterv](docs/PROJECT_PLAN.md)
-- [Fejlesztési roadmap](docs/ROADMAP.md)
-- [Szabálykatalógus](docs/RULE_CATALOG.md)
-- [Referencia-repók](docs/REFERENCE_ADOPTION.md)
+Indíts friss Devin munkamenetet; ellenőrizd, hogy elérhető-e a **/web-audit:full-audit**, **/web-audit:technical-seo** és **/web-audit:aeo-geo** skill. A GitHubon végzett frissítés önmagában nem garantálja, hogy a helyi Devin-telepítés frissült.
 
-A jelenlegi HTML/canonical és sitemap/robots parser részleges; ezek robusztusabb validátorokra történő lecserélése a következő fejlesztési fázis része.
+**Mintaindító kérés:**
 
-**Biztonság:** ne futtass ismeretlen buildscriptet engedély nélkül, és ne publikálj ügyfél URL-eket, hitelesítési adatokat vagy privát HTML-t a nyilvános repositoryba.
+> Futtasd a /web-audit:full-audit skillt az aktuális weboldalprojekten. Csak olvass, semmit ne módosíts. SEO, AEO/GEO, performance és accessibility területeken csak ténylegesen elérhető adatból dolgozz; a hiányzó eszközök/ellenőrzések legyenek not-tested. Adj magyar nyelvű, URL-enként bizonyított és priorizált javítási tervet.
+
+**14 önálló skill:**
+full-audit, quick-audit, technical-seo, on-page-seo, international-seo, structured-data, internal-links, image-audit, performance, accessibility, content-seo, aeo-geo, local-seo, audit-report.
+
+Részletes telepítési és parancslista: [Plugin README](plugins/web-audit/README.md) és [Skillset használata](docs/SKILLSET_USAGE.md).
+
+## Webes ChatGPT
+
+A Devin plugin nem települ automatikusan ChatGPT-be. Nyisd meg vagy add meg a GitHub-fájlokat, és használd az ehhez elkészített [ChatGPT projektutasítást](integrations/chatgpt/PROJECT_INSTRUCTIONS.md). A ChatGPT tényleges eszközelérése dönti el, mely vizsgálatok végezhetők el.
+
+Codex / más agent: [integrációs útmutató](integrations/codex/README.md).
+
+## Mi működik és mi nem?
+
+| Funkció | Státusz |
+|---|---|
+| Skillalapú SEO, AEO/GEO, tartalom, hreflang, schema, accessibility, performance értelmezés | **Kész, eljárásként**; valós forrásokon ténylegesen alkalmazni kell |
+| Devin plugin és 14 feladat-skill, közös protokoll és riportminta | **Elkészült**, szerkezeti CI-validációval |
+| Webes ChatGPT által olvasható módszertan | **Elkészült**; beolvasáshoz a GitHubhoz való tényleges hozzáférés kell |
+| TypeScript CLI v0.4.0: canonical, alap sitemap és robots | **Meglévő, korlátozott** determinista ellenőrző |
+| Automatikus hreflang, schema, image, CWV, WCAG, GEO hivatkozásmérés | **Nincs beépítve**; külső eszköz/adat vagy szakmai ellenőrzés kell |
+| Éles ügyféloldal audit és Devin Desktopban való frissítés tesztje | **Külön validálandó** a saját környezetedben |
+
+## Opcionális CLI (Node.js >=22.6)
+
+A CLI **nem része** a telepített Devin plugin binárisainak; a forrásrepo és egy korábban generált, megbízható statikus site dist könyvtár kell hozzá:
+
+~~~bash
+npm test
+npm run audit -- --dir /ABSOLUTE/PATH/TO/dist --site https://REAL-DOMAIN.example/ --out /SAFE/REPORT/PATH
+npm run audit -- --config /ABSOLUTE/PATH/TO/web-quality.config.json
+~~~
+
+A valós ügyfél domainjét használd; a példák helyettesítendők. A CLI v0.4.0 quick = canonical, full = canonical/basic sitemap/basic robots, content = **nulla végrehajtott tartalmi teszt**. JSON schemaVersion 2 tartalmazza a coverage és manifest mezőket; a not-tested nem pass.
+
+## Fejlesztési és szakmai referenciák
+
+- [Teljes projektterv](docs/PROJECT_PLAN.md), [Roadmap](docs/ROADMAP.md), [Rule catalog](docs/RULE_CATALOG.md), [Repo referenciák](docs/REFERENCE_ADOPTION.md)
+- [Skill közös módszertan](plugins/web-audit/references/AUDIT_PROTOCOL.md), [auditriport-sablon](plugins/web-audit/references/REPORT_TEMPLATE.md)
+- https://github.com/coreyhaines31/marketingskills
+- https://github.com/AgriciDaniel/claude-seo
+- https://github.com/seoskillsai/seo-skills-ai
+
+A skillek saját megfogalmazású módszertani adaptációk. Sem harmadik féltől származó szkripteket, sem fizetős API-t nem futtat automatikusan a plugin. Auditor munkában **read-only alapértelmezés**, mérési és jogosultsági korlátok őszinte jelzése.
