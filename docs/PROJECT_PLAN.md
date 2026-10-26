@@ -1,3 +1,5 @@
+> **Fókuszfrissítés — 2026-10-26:** Az elsődleges termék most a **hordozható Web Audit skillset v1.0.0**, nem egy új SEO crawler. A 14 Devin skill, a közös protokoll, riportminta és a ChatGPT/Codex használati útmutató elkészült. A TypeScript CLI v0.4.0 opcionális segédeszköz marad. Az alábbi korábbi, teljes technikai automata motorra vonatkozó feladatok **nem automatikusan készültek el**; szükség esetén külön termékfejlesztésként kezeljük őket.
+
 # Web Quality Toolkit — teljes projektterv
 
 > **Verzió:** Concept 1.1 — 2026. október 26.  

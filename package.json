@@ -3,9 +3,12 @@
   "version": "0.4.0",
   "private": true,
   "type": "module",
-  "engines": {"node": ">=22.6"},
+  "engines": {
+    "node": ">=22.6"
+  },
   "scripts": {
     "audit": "node --experimental-strip-types src/cli.ts",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "test": "node --experimental-strip-types --test tests/*.test.ts && node scripts/validate-skills.mjs",
+    "test:skills": "node scripts/validate-skills.mjs"
   }
 }
