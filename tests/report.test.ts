@@ -20,7 +20,7 @@ test('explicit coverage never treats unexecuted rule families as passed', () => 
     generatedAt: '2026-10-26T00:00:00.000Z',
   });
   assert.equal(result.schemaVersion, 2);
-  assert.equal(result.toolVersion, '0.3.0');
+  assert.equal(result.toolVersion, '0.4.0');
   assert.equal(result.scannedPages, 2);
   assert.equal(result.passedPages, 1);
   assert.equal(result.coverage.executed, 4);
