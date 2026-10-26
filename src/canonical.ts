@@ -1,5 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
+import * as cheerio from 'cheerio';
 import type { Finding } from './types.ts';
 
 export async function htmlFiles(directory: string): Promise<string[]> {
@@ -20,20 +21,25 @@ export function expectedUrl(file: string, directory: string, siteUrl: string): s
   const path = relative(directory, file).split(sep).join('/');
   const clean = path === 'index.html' ? '' : path.endsWith('/index.html') ? path.slice(0, -'index.html'.length) : path;
   const base = new URL(siteUrl);
-  // Reject build directories with accidental traversal: relative paths are only generated from enumerated files.
+  // The caller only passes enumerated files; no externally provided path is resolved here.
   const prefix = base.pathname.replace(/\/$/, '') + '/';
   return new URL(prefix + clean, base.origin).href;
 }
 
-function extractCanonical(html: string): string[] {
-  const links = html.match(/<link\b[^>]*>/gi) ?? [];
-  return links.flatMap(tag => {
-    const attributes = new Map<string, string>();
-    const attrPattern = /([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g;
-    for (const match of tag.matchAll(attrPattern)) attributes.set(match[1]!.toLowerCase(), match[2] ?? match[3] ?? match[4] ?? '');
-    if (!(attributes.get('rel') ?? '').toLowerCase().split(/\s+/).includes('canonical')) return [];
-    return [attributes.get('href') ?? ''];
+/**
+ * Read actual document <head> link tags using a standards-based HTML parser.
+ * Comments and script strings must never create fake canonical links.
+ */
+export function extractCanonical(html: string): string[] {
+  const $ = cheerio.load(html);
+  const canonical: string[] = [];
+  $('head link').each((_, element) => {
+    const rel = $(element).attr('rel') ?? '';
+    if (rel.toLowerCase().split(/\s+/).includes('canonical')) {
+      canonical.push($(element).attr('href') ?? '');
+    }
   });
+  return canonical;
 }
 
 export async function checkCanonical(file: string, directory: string, siteUrl: string): Promise<Finding[]> {
@@ -43,7 +49,7 @@ export async function checkCanonical(file: string, directory: string, siteUrl: s
   const finding = (id: string, message: string, evidence?: Record<string, string | number>): Finding => ({
     id, category: 'canonical', severity: 'high', status: 'confirmed', file: rel, message, evidence,
   });
-  if (!hrefs.length) return [finding('CANONICAL_MISSING', 'Missing canonical link element')];
+  if (!hrefs.length) return [finding('CANONICAL_MISSING', 'Missing canonical link element in document head')];
   if (hrefs.length > 1) return [finding('CANONICAL_MULTIPLE', 'Multiple canonical link elements found', { count: hrefs.length })];
   const href = hrefs[0]!;
   let actual: URL;
